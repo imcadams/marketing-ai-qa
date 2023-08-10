@@ -1,0 +1,7 @@
+langchain
+openai
+python-dotenv
+unstructured<=0.7.12
+faiss-cpu
+tiktoken
+pyinstaller
