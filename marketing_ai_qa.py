@@ -9,13 +9,20 @@ from langchain.text_splitter import TokenTextSplitter
 from langchain.vectorstores import FAISS
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.chains import ConversationalRetrievalChain
-from langchain.prompts import PromptTemplate
-from langchain.agents.agent_toolkits import create_retriever_tool
-from langchain.agents.agent_toolkits import create_conversational_retrieval_agent
+from langchain.memory import ConversationSummaryMemory
+from langchain.prompts import (
+    SystemMessagePromptTemplate,
+    HumanMessagePromptTemplate,
+    ChatPromptTemplate
+)
 
 from dotenv import load_dotenv
 
-class MarketingAiAgent:
+
+class MarketingAiQA:
+    """
+    Marketing AI QA Class
+    """
 
     def __init__(self):
         extDataDir = os.getcwd()
@@ -23,7 +30,7 @@ class MarketingAiAgent:
             extDataDir = sys._MEIPASS
         load_dotenv(dotenv_path=os.path.join(extDataDir, '.env'))
 
-        #init Azure OpenAI
+        # init Azure OpenAI
         openai.api_type = os.getenv('OPENAI_API_TYPE')
         openai.api_base = os.getenv('OPENAI_API_BASE')
         openai.api_key = os.getenv('OPENAI_API_KEY')
@@ -34,39 +41,56 @@ class MarketingAiAgent:
         text_splitter = TokenTextSplitter(chunk_size=1000, chunk_overlap=0)
         docs = text_splitter.split_documents(documents)
 
+        # Initial prompt and format
+        general_system_template = r""" 
+        Your name is Marketing, last name Guru.
+        You are a friendly marketing guru with 100 years of experience in the paper products industry.
+        Given a specific context, please give a short answer to the question, covering the required 
+        advices in general and then provide the names all of relevant(even if it relates a bit) products.
+        Whenever asked for images alway include the url in the 'URL' column of the data, not the one in the 'PATH' column.
+        Refer to yourself as I, as you are acting as a human, one that is an expert at marketing.
+        If you don't have enough information to provide the response, ask for more information from the human.
+        Do not refer to yourself as 'the AI'
+        When the human introduces himself, be courteous and friendly and introduce yourself as a marketing guru, for this response, be verbose.
+        ----
+        {context}
+        ----
+        """
+        general_user_template = "Question:```{question}```"
+        messages = [
+            SystemMessagePromptTemplate.from_template(general_system_template),
+            HumanMessagePromptTemplate.from_template(general_user_template)
+        ]
+        qa_prompt = ChatPromptTemplate.from_messages(messages)
+
         embeddings = OpenAIEmbeddings(
             deployment='text-embedding-ada-002',
             chunk_size=1
-            )
-        
+        )
         db = FAISS.from_documents(docs, embeddings)
-
         llm = AzureChatOpenAI(
-            deployment_name='GenAIhackathon'
+            deployment_name='GenAIhackathon',
+            temperature=0.7
         )
 
-        prompt = PromptTemplate.from_template('You are a marketing assistant with 100 years of experience. Your job ' \
-                    + 'is to answer questions about marketing. Please do not ' \
-                    + 'handle answers NOT related to marketing, or give any ' \
-                    + 'information back to the human that is not marketing ' \
-                    + 'related.' \
-                    + 'Chat History:' \
-                    + '{chat_history}' \
-                    + 'Follow Up Input: {question}' \
-                    + 'Assisstant:')
+        memory = ConversationSummaryMemory(
+            llm=llm, memory_key="chat_history", return_messages=True)
+        self.qa = ConversationalRetrievalChain.from_llm(llm=llm,
+                                                        retriever=db.as_retriever(),
+                                                        memory=memory,
+                                                        verbose=False,
+                                                        combine_docs_chain_kwargs={'prompt': qa_prompt})
 
-        self.agent_executor = ConversationalRetrievalChain.from_llm(llm=llm,
-                                           retriever=db.as_retriever(),
-                                           condense_question_prompt=prompt,
-                                           return_source_documents=True,
-                                           verbose=False)
-
-    def handle_chat(self, question, chat_history):
-        result = self.agent_executor({"question": question, "chat_history": chat_history})
+    def handle_chat(self, question):
+        """
+        Executes QA retrieval
+        """
+        result = self.qa(question)
         return result
 
+
 def main():
-    bot = MarketingAiAgent()
+    bot = MarketingAiQA()
 
     print()
     print('I am a Marketing Guru, please let me know how I can help you! I can answer questions or generate content relating to the data you supplied me with.')
@@ -75,10 +99,9 @@ def main():
     print()
 
     running = True
-    chat_history = []
 
-    while(running):
-        question = input('Please enter your query: ')
+    while (running):
+        question = input('Send message: ')
 
         if question.strip().upper() == 'EXIT':
             running = False
@@ -86,11 +109,11 @@ def main():
             print('Thank you for our chat!')
             print()
         else:
-            bot_chat = bot.handle_chat(question, chat_history)
+            bot_chat = bot.handle_chat(question)
             print()
             print(f'Marketing Guru: {bot_chat["answer"]}')
             print()
-            chat_history.append((question, bot_chat["answer"]))
+
 
 if __name__ == '__main__':
     main()
