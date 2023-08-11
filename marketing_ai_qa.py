@@ -92,7 +92,7 @@ class MarketingAiQA:
 def main():
     bot = MarketingAiQA()
 
-    print(r"""\
+    print(r"""
  ██████  ███████  ██████  ██████   ██████  ██  █████        ██████   █████   ██████ ██ ███████ ██  ██████ 
 ██       ██      ██    ██ ██   ██ ██       ██ ██   ██       ██   ██ ██   ██ ██      ██ ██      ██ ██      
 ██   ███ █████   ██    ██ ██████  ██   ███ ██ ███████ █████ ██████  ███████ ██      ██ █████   ██ ██      
@@ -109,7 +109,7 @@ def main():
     running = True
 
     while (running):
-        question = input('Send message: ')
+        question = input(f'\033[92mSend message: \x1B[37m')
 
         if question.strip().upper() == 'EXIT':
             running = False
@@ -119,7 +119,7 @@ def main():
         else:
             bot_chat = bot.handle_chat(question)
             print()
-            print(f'Marketing Guru: {bot_chat["answer"]}')
+            print(f'\x1B[36mMarketing Guru: \x1B[37m{bot_chat["answer"]}')
             print()
 
 
