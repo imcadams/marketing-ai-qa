@@ -1,0 +1,1 @@
+call python -m venv venv && venv\Scripts\activate.bat && start pip install -r ./requirements.txt && pause
