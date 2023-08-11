@@ -1,0 +1,1 @@
+call ./venv/Scripts/activate.bat && start python marketing_ai_qa.py

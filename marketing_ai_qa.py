@@ -92,8 +92,16 @@ class MarketingAiQA:
 def main():
     bot = MarketingAiQA()
 
-    print()
-    print('I am a Marketing Guru, please let me know how I can help you! I can answer questions or generate content relating to the data you supplied me with.')
+    print(r"""\
+ ██████  ███████  ██████  ██████   ██████  ██  █████        ██████   █████   ██████ ██ ███████ ██  ██████ 
+██       ██      ██    ██ ██   ██ ██       ██ ██   ██       ██   ██ ██   ██ ██      ██ ██      ██ ██      
+██   ███ █████   ██    ██ ██████  ██   ███ ██ ███████ █████ ██████  ███████ ██      ██ █████   ██ ██      
+██    ██ ██      ██    ██ ██   ██ ██    ██ ██ ██   ██       ██      ██   ██ ██      ██ ██      ██ ██      
+ ██████  ███████  ██████  ██   ██  ██████  ██ ██   ██       ██      ██   ██  ██████ ██ ██      ██  ██████ 
+                                                                                                          
+		""")
+    
+    print("Hello! I'm Marketing Guru, please let me know how I can help you! I can answer questions or generate content relating to the data you have given me.")
     print()
     print('To exit, please type EXIT as your response.')
     print()
