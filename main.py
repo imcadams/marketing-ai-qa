@@ -19,9 +19,9 @@ from langchain.prompts import (
 from dotenv import load_dotenv
 os.system('color')
 
-class MarketingRetrievalAgent:
+class MarketingAiQA:
     """
-    Marketing Retrieval Agent Class
+    Marketing AI QA Class
     """
 
     def __init__(self):
@@ -78,13 +78,16 @@ class MarketingRetrievalAgent:
         )
         db = FAISS.from_documents(docs, embeddings)
 
-        # Inst
+        # Get LLM
         llm = AzureChatOpenAI(
             deployment_name='GenAIhackathon',
             temperature=0.7
         )
 
+        # Use conversation memory
         memory = ConversationSummaryMemory(llm=llm, memory_key="chat_history", return_messages=True)
+        
+        # Get conversational retrieval chain
         self.qa = ConversationalRetrievalChain.from_llm(llm=llm,
                                                         retriever=db.as_retriever(),
                                                         memory=memory,
@@ -93,14 +96,14 @@ class MarketingRetrievalAgent:
 
     def handle_chat(self, question):
         """
-        Executes retrieval
+        Executes QA retrieval
         """
         result = self.qa(question)
         return result
 
 
 def main():
-    agent = MarketingRetrievalAgent()
+    bot = MarketingAiQA()
 
     print(r"""
  ██████  ███████  ██████  ██████   ██████  ██  █████        ██████   █████   ██████ ██ ███████ ██  ██████ 
@@ -114,8 +117,8 @@ def main():
     print()
     
     # If there is a warning, display it in red
-    if(len(agent.warning) > 0):
-        print(f'\x1b[31m' + agent.warning + '\x1B[37m')
+    if(len(bot.warning) > 0):
+        print(f'\x1b[31m' + bot.warning + '\x1B[37m')
         print()
 
     print('To exit, please type EXIT as your response.')
@@ -132,7 +135,7 @@ def main():
             print('Thank you for our chat!')
             print()
         else:
-            bot_chat = agent.handle_chat(question)
+            bot_chat = bot.handle_chat(question)
             print()
             print(f'\x1B[36mMarketing Guru: \x1B[37m{bot_chat["answer"]}')
             print()
