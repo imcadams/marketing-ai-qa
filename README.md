@@ -1,8 +1,8 @@
-# Marketing AI QA Bot
-Marketing AI QA bot, with ability to add a directory to analyze textual data. The goal is to be able to be able to have the AI analyze the data and generate text based marketing materials.
+# Marketing Campaign Chatbot
+Ask questions about marketing data, get advice, analysis, or generate any form of text based content. Give the Marketing Campaign Chatbot your campaign directory path and it will index the data for you, and analyze it with the help of ChatGPT to provide you with the marketing assistance you need.
 
 # Installation
-Marketing AI QA bot needs [Python 3.10](https://www.python.org/downloads/release/python-3100/) to run.
+Marketing Campaign Chatbot needs [Python 3.10](https://www.python.org/downloads/release/python-3100/) to run.
 
 At the root directory of the program, run the `setup.bat` script first. 
 
@@ -11,7 +11,7 @@ Then you must update the `.env` file with the [AzureOpenAI](https://oai.azure.co
 Once that's complete, you can start the program by executing the `run.bat` script.
 
 # Usage
-The Marketing AI QA bot uses the ChatGPT 3.5 model in conjunction with cognitive search to intelligently query the data, in a human like fashion. It uses converstaion memory, so it can reference previously mentioned items for new queries.
+The Marketing Campaign Chatbot uses the ChatGPT 3.5 model in conjunction with cognitive search to intelligently query the data, in a human like fashion. It uses converstaion memory, so it can reference previously mentioned items for new queries.
 
 Here are some examples of what is can generate:
 - Marketing emails
